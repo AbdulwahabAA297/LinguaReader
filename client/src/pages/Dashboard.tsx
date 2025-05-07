@@ -19,33 +19,63 @@ export default function Dashboard() {
   const [retentionScore, setRetentionScore] = useState(0);
   const [recentBooks, setRecentBooks] = useState<any[]>([]);
   
+  // Define types for our data
+  interface Book {
+    id: number;
+    title: string;
+    author?: string;
+    language: string;
+    filePath: string;
+    lastOpened?: string;
+    currentPosition?: string;
+    fileType: string;
+  }
+  
+  interface VocabularyItem {
+    id: number;
+    word: string;
+    definition: string;
+    context: string;
+    language: string;
+    bookId?: number;
+    familiarityScore: number;
+    lastReviewed: string;
+    nextReview: string;
+  }
+  
   // Get all books
-  const { data: books = [] } = useQuery({
+  const { data: books = [] } = useQuery<Book[]>({
     queryKey: ['/api/books'],
   });
   
   // Get vocabulary items
-  const { data: vocabularyItems = [] } = useQuery({
+  const { data: vocabularyItems = [] } = useQuery<VocabularyItem[]>({
     queryKey: ['/api/vocabulary'],
   });
   
   useEffect(() => {
-    // Calculate due items count
-    const dueItems = getItemsDueForReview(vocabularyItems);
-    setDueCount(dueItems.length);
-    
-    // Calculate retention score
-    const score = calculateRetentionScore(vocabularyItems);
-    setRetentionScore(score);
-    
-    // Get recent books (last 3 opened)
-    const sorted = [...books].sort((a, b) => {
-      if (!a.lastOpened) return 1;
-      if (!b.lastOpened) return -1;
-      return new Date(b.lastOpened).getTime() - new Date(a.lastOpened).getTime();
-    });
-    setRecentBooks(sorted.slice(0, 3));
-  }, [books, vocabularyItems]);
+    if (vocabularyItems && vocabularyItems.length >= 0) {
+      // Calculate due items count
+      const dueItems = getItemsDueForReview(vocabularyItems);
+      setDueCount(dueItems.length);
+      
+      // Calculate retention score
+      const score = calculateRetentionScore(vocabularyItems);
+      setRetentionScore(score);
+    }
+  }, [vocabularyItems]);
+  
+  useEffect(() => {
+    if (books && books.length >= 0) {
+      // Get recent books (last 3 opened)
+      const sorted = [...books].sort((a, b) => {
+        if (!a.lastOpened) return 1;
+        if (!b.lastOpened) return -1;
+        return new Date(b.lastOpened).getTime() - new Date(a.lastOpened).getTime();
+      });
+      setRecentBooks(sorted.slice(0, 3));
+    }
+  }, [books]);
   
   return (
     <div className="container mx-auto py-6 space-y-8">

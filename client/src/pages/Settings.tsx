@@ -27,25 +27,39 @@ export default function Settings() {
   const [offlineMode, setOfflineMode] = useState(false);
   const [defaultLanguage, setDefaultLanguage] = useState('en');
   
+  // Define type for settings
+  interface Setting {
+    id: number;
+    key: string;
+    value: any;
+  }
+  
+  interface Language {
+    id: number;
+    code: string;
+    name: string;
+    enabled: boolean;
+  }
+  
   // Fetch languages
-  const { data: languages = [] } = useQuery({
+  const { data: languages = [] } = useQuery<Language[]>({
     queryKey: ['/api/languages'],
   });
   
   // Fetch settings
-  const { data: fontSizeSetting } = useQuery({
+  const { data: fontSizeSetting } = useQuery<Setting>({
     queryKey: ['/api/settings/fontSize'],
   });
   
-  const { data: renderModeSetting } = useQuery({
+  const { data: renderModeSetting } = useQuery<Setting>({
     queryKey: ['/api/settings/renderMode'],
   });
   
-  const { data: offlineModeSetting } = useQuery({
+  const { data: offlineModeSetting } = useQuery<Setting>({
     queryKey: ['/api/settings/offlineMode'],
   });
   
-  const { data: defaultLanguageSetting } = useQuery({
+  const { data: defaultLanguageSetting } = useQuery<Setting>({
     queryKey: ['/api/settings/defaultLanguage'],
   });
   
@@ -309,7 +323,11 @@ export default function Settings() {
                 <Label>Application Information</Label>
                 <div className="text-sm">
                   <p><strong>Version:</strong> 1.0.0</p>
-                  <p><strong>Local Data Directory:</strong> {window.electronAPI.getUserDataPath().catch(() => 'Unknown')}</p>
+                  <p><strong>Local Data Directory:</strong> {
+                    typeof window.electronAPI !== 'undefined' 
+                      ? 'Your personal computer' 
+                      : 'Web environment'
+                  }</p>
                 </div>
               </div>
             </CardContent>
