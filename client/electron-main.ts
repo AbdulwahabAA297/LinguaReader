@@ -4,6 +4,7 @@ import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { fileURLToPath } from 'url';
+import isDev from 'electron-is-dev';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow: BrowserWindow | null = null;
@@ -19,12 +20,12 @@ function createWindow() {
     }
   });
 
-  // Load the index.html from the React app
-  if (process.env.NODE_ENV === 'development') {
+  // Load the React app based on environment
+  if (isDev) {
     mainWindow.loadURL('http://localhost:5000');
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
   mainWindow.on('closed', () => {
