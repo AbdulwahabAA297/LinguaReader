@@ -141,7 +141,7 @@ export default function BookImportDialog({ isOpen, onClose, languages }: BookImp
         bookData = {
           ...formData,
           fileType: browserFile.name.split('.').pop()?.toLowerCase() || '',
-          filePath: 'browser-upload' // Placeholder for browser uploads
+          filePath: `browser-upload://${browserFile.name}` // Use a special URL format to identify browser files
         };
         
         // In a full implementation, we would use FormData and upload the file

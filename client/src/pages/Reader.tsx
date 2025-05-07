@@ -22,13 +22,42 @@ export default function Reader() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   
+  // Define book type
+  interface Book {
+    id: number;
+    title: string;
+    author: string | null;
+    language: string;
+    filePath: string;
+    fileType: string;
+    currentPosition: string | null;
+    totalPages: number | null;
+    coverImage: string | null;
+    dateAdded: Date | null;
+    lastOpened: Date | null;
+  }
+  
+  // Define vocabulary item type
+  interface VocabularyItem {
+    id: number;
+    word: string;
+    translation: string | null;
+    context: string | null;
+    language: string;
+    bookId: number | null;
+    familiarityScore: number | null;
+    dateAdded: Date | null;
+    lastReviewed: Date | null;
+    nextReviewDate: Date | null;
+  }
+  
   // Fetch book details
-  const { data: book } = useQuery({
+  const { data: book } = useQuery<Book>({
     queryKey: [`/api/books/${id}`],
   });
   
   // Fetch vocabulary for the book's language
-  const { data: vocabularyItems = [] } = useQuery({
+  const { data: vocabularyItems = [] } = useQuery<VocabularyItem[]>({
     queryKey: [`/api/vocabulary/language/${book?.language}`],
     enabled: !!book?.language,
   });
@@ -47,9 +76,37 @@ export default function Reader() {
       try {
         setIsLoading(true);
         
-        // Parse the book file
-        const parsedBook = await parseFile(book.filePath);
-        setBookText(parsedBook.content);
+        // Parse the book file 
+        try {
+          // First try to get the book content from the server
+          const parsedBook = await parseFile(book.filePath);
+          // Make sure we have actual content
+          if (parsedBook.content && parsedBook.content.trim() !== '') {
+            setBookText(parsedBook.content);
+          } else {
+            // Fallback to sample content if no real content
+            setBookText(
+              `Chapter 1: ${book.title}\n\n` +
+              `By ${book.author || 'Unknown'}\n\n` +
+              `This is the beginning of ${book.title}. This is a sample text that would normally contain the actual content of your book. ` +
+              `In a real implementation, the full text of the book would be displayed here. ` +
+              `You can still try out the basic functionality like highlighting words, using the dictionary, and saving vocabulary.\n\n` +
+              `You can adjust the font size, theme, and other settings using the toolbar above. ` +
+              `Try clicking on any word to look it up in the dictionary. ` +
+              `You can also enable highlight mode to save words to your vocabulary.\n\n` +
+              `Here are some sample paragraphs with a mix of common and uncommon words for you to practice with:\n\n` +
+              `The sun was setting behind the mountains, casting a warm glow over the valley. The birds were returning to their nests, singing their evening songs. ` +
+              `A gentle breeze rustled the leaves of the ancient oak trees. It was a tranquil scene, perfect for contemplation and reflection.\n\n` +
+              `Sarah walked along the path, her footsteps barely audible on the soft ground. She had been exploring the forest since dawn, documenting the various plants and animals she encountered. ` +
+              `Her journal was filled with detailed notes and sketches. As a botanist, she found this ecosystem particularly fascinating.\n\n` +
+              `Later, they would gather around the campfire, sharing stories and roasting marshmallows. ` +
+              `It was a tradition that had started years ago, when they first discovered this hidden paradise.`
+            );
+          }
+        } catch (error) {
+          console.error("Error parsing book content:", error);
+          setBookText("Error loading book content. Please try again later.");
+        }
         
         // Update book's last opened timestamp
         await apiRequest('PUT', `/api/books/${id}`, {

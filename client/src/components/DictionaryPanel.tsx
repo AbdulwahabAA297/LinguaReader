@@ -280,12 +280,39 @@ export default function DictionaryPanel({ word, context, language, bookId, onClo
         <TabsContent value="save">
           <CardContent className="space-y-4 pt-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Translation</label>
+              <label className="text-sm font-medium">
+                Translation {language === 'ar' ? '(English)' : 
+                            language === 'en' ? '(Your Language)' : 
+                            `(${language === 'es' ? 'Spanish' : 
+                               language === 'fr' ? 'French' : 
+                               language === 'de' ? 'German' : 
+                               language === 'it' ? 'Italian' : 
+                               language === 'ru' ? 'Russian' : 
+                               language === 'zh' ? 'Chinese' : 
+                               language === 'ja' ? 'Japanese' : 
+                               'Target Language'} to English)`}
+              </label>
               <Input 
-                placeholder="Enter translation" 
+                placeholder={`Enter translation in ${language === 'ar' ? 'English' : 
+                              language === 'en' ? 'your preferred language' : 'English'}`}
                 value={translation} 
                 onChange={(e) => setTranslation(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">
+                {language === 'ar' 
+                  ? 'Enter the English equivalent of this Arabic word' 
+                  : language === 'en' 
+                  ? 'Enter this word in your native language' 
+                  : `Enter the English translation of this ${
+                      language === 'es' ? 'Spanish' : 
+                      language === 'fr' ? 'French' : 
+                      language === 'de' ? 'German' : 
+                      language === 'it' ? 'Italian' : 
+                      language === 'ru' ? 'Russian' : 
+                      language === 'zh' ? 'Chinese' : 
+                      language === 'ja' ? 'Japanese' : 'foreign'
+                    } word`}
+              </p>
             </div>
             
             <div className="space-y-2">

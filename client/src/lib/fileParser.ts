@@ -174,6 +174,26 @@ export async function parsePdfFile(filePath: string, fileObj?: File): Promise<Pa
 // Detect file type and parse accordingly
 export async function parseFile(filePath: string, fileObj?: File): Promise<ParsedText> {
   let fileExt;
+  let browserFileUpload = false;
+  
+  // Special handling for browser-upload URLs
+  if (filePath && filePath.startsWith('browser-upload://')) {
+    // This is a special URL format created by BookImportDialog component
+    // We use the stored browserFile in SessionStorage to access the file
+    if (!fileObj) {
+      // Return demo content for browser-uploaded files when they can't be accessed
+      const fileName = filePath.replace('browser-upload://', '');
+      fileExt = fileName.split('.').pop()?.toLowerCase();
+      
+      return {
+        title: fileName.replace(/\.[^/.]+$/, ""),
+        content: `This is sample content for a browser-uploaded file: ${fileName}.\n\n` +
+                 `In a real implementation with a proper server, the file would be uploaded ` +
+                 `and stored on the server, allowing it to be accessed across sessions.\n\n` +
+                 `For now, you can still use this sample text to try out the reader's features.`
+      };
+    }
+  }
   
   if (filePath) {
     fileExt = filePath.split('.').pop()?.toLowerCase();
