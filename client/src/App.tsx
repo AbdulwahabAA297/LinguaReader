@@ -30,14 +30,46 @@ function Navigation() {
   }
   
   const items = [
-    { name: 'Dashboard', href: '/', icon: Home },
-    { name: 'Library', href: '/library', icon: LibraryIcon },
-    { name: 'Vocabulary', href: '/vocabulary', icon: BookOpen },
-    { name: 'Settings', href: '/settings', icon: SettingsIcon },
+    { 
+      name: 'Dashboard', 
+      href: '/', 
+      icon: Home,
+      description: 'Overview of your reading progress'
+    },
+    { 
+      name: 'Library', 
+      href: '/library', 
+      icon: LibraryIcon,
+      description: 'Manage your book collection'
+    },
+    { 
+      name: 'Vocabulary', 
+      href: '/vocabulary', 
+      icon: BookOpen,
+      description: 'Review saved words and phrases'
+    },
+    { 
+      name: 'Settings', 
+      href: '/settings', 
+      icon: SettingsIcon,
+      description: 'Customize your experience'
+    },
   ];
   
   return (
-    <Sidebar items={items} />
+    <div className="border-r border-border h-full min-h-screen">
+      <Sidebar items={items} />
+      <div className="px-4 py-6 mt-auto hidden lg:block">
+        <div className="border-t pt-4">
+          <p className="text-xs text-muted-foreground">
+            LinguaReader 1.0.0
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Offline reading & vocabulary
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -3,49 +3,50 @@
 @tailwind utilities;
 
 :root {
-      --background: 0 0% 100%;
---foreground: 20 14.3% 4.1%;
---muted: 60 4.8% 95.9%;
---muted-foreground: 25 5.3% 44.7%;
---popover: 0 0% 100%;
---popover-foreground: 20 14.3% 4.1%;
---card: 0 0% 100%;
---card-foreground: 20 14.3% 4.1%;
---border: 20 5.9% 90%;
---input: 20 5.9% 90%;
---primary: 207 90% 54%;
---primary-foreground: 211 100% 99%;
---secondary: 60 4.8% 95.9%;
---secondary-foreground: 24 9.8% 10%;
---accent: 60 4.8% 95.9%;
---accent-foreground: 24 9.8% 10%;
---destructive: 0 84.2% 60.2%;
---destructive-foreground: 60 9.1% 97.8%;
---ring: 20 14.3% 4.1%;
---radius: 0.5rem;
-  }
-  .dark {
-      --background: 240 10% 3.9%;
---foreground: 0 0% 98%;
---muted: 240 3.7% 15.9%;
---muted-foreground: 240 5% 64.9%;
---popover: 240 10% 3.9%;
---popover-foreground: 0 0% 98%;
---card: 240 10% 3.9%;
---card-foreground: 0 0% 98%;
---border: 240 3.7% 15.9%;
---input: 240 3.7% 15.9%;
---primary: 207 90% 54%;
---primary-foreground: 211 100% 99%;
---secondary: 240 3.7% 15.9%;
---secondary-foreground: 0 0% 98%;
---accent: 240 3.7% 15.9%;
---accent-foreground: 0 0% 98%;
---destructive: 0 62.8% 30.6%;
---destructive-foreground: 0 0% 98%;
---ring: 240 4.9% 83.9%;
---radius: 0.5rem;
-  }
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 215 20.2% 65.1%;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 217.2 32.6% 17.5%;
+  --radius: 0.75rem;
+}
 
 @layer base {
   * {
@@ -55,4 +56,107 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  /* Add custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted rounded-lg;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/60 rounded-lg hover:bg-primary/80 transition-colors;
+  }
+}
+
+/* Custom classes for reader */
+.reader-container {
+  @apply p-6 max-w-3xl mx-auto my-8 bg-card rounded-lg shadow-lg;
+}
+
+.reader-paragraph {
+  @apply my-4 leading-relaxed;
+}
+
+.reader-sentence {
+  @apply my-2 leading-relaxed;
+}
+
+/* Word highlight styles */
+.word-highlight {
+  @apply relative inline cursor-pointer rounded px-0.5 py-0.5 transition-colors;
+}
+
+.word-highlight:hover {
+  @apply bg-primary/10;
+}
+
+.word-known {
+  @apply bg-green-100 dark:bg-green-950/30;
+}
+
+.word-learning {
+  @apply bg-amber-100 dark:bg-amber-950/30;
+}
+
+.word-new {
+  @apply bg-primary/5;
+}
+
+.highlight-mode .word-highlight {
+  @apply hover:bg-primary/20;
+}
+
+/* Custom dictionary panel */
+.dictionary-panel {
+  @apply fixed right-6 bottom-6 w-80 max-h-[60vh] bg-card rounded-lg shadow-lg border overflow-hidden;
+  @apply transform transition-transform;
+}
+
+.dictionary-panel-header {
+  @apply sticky top-0 flex items-center justify-between p-3 bg-card border-b;
+}
+
+.dictionary-panel-content {
+  @apply p-4 overflow-y-auto max-h-[calc(60vh-60px)];
+}
+
+/* Flashcard animations */
+.flashcard {
+  @apply relative bg-card rounded-2xl p-6 shadow-md transition-all;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.flashcard-flip {
+  transform: rotateY(180deg);
+  transition: transform 0.6s;
+}
+
+.flashcard-front, .flashcard-back {
+  @apply absolute top-0 left-0 w-full h-full p-6 rounded-2xl;
+  backface-visibility: hidden;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+/* For dark mode toggles */
+.dark .dark-toggle {
+  @apply hidden;
+}
+
+.light-toggle {
+  @apply hidden;
+}
+
+.dark .light-toggle {
+  @apply block;
 }
