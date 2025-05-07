@@ -90,6 +90,7 @@ export class MemStorage implements IStorage {
   private initializeDefaultLanguages() {
     const defaultLanguages: InsertLanguage[] = [
       { code: 'en', name: 'English', enabled: true },
+      { code: 'ar', name: 'Arabic', enabled: true },
       { code: 'es', name: 'Spanish', enabled: true },
       { code: 'fr', name: 'French', enabled: true },
       { code: 'de', name: 'German', enabled: true },

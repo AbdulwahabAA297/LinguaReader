@@ -42,16 +42,32 @@ export default function DictionaryPanel({ word, context, language, bookId, onClo
         const items = await fetch(`/api/vocabulary/language/${language}`).then(res => res.json());
         const existingItem = items.find((item: any) => item.word.toLowerCase() === word.toLowerCase());
         
+        // Look up word in dictionary first
+        const result = await lookupWord(word, language);
+        setDictResult(result);
+        
+        // If word exists in vocabulary, load data from there
         if (existingItem) {
           setTranslation(existingItem.translation || '');
           setNotes(existingItem.notes || '');
           setFamiliarityScore(existingItem.familiarityScore || 1);
           setCurrentTab('save');
+        } 
+        // Otherwise, pre-fill with translation from dictionary (if available)
+        else if (result?.translations && result.translations.length > 0) {
+          // Prefer English translation if available
+          const englishTranslation = result.translations.find(t => t.language === 'en');
+          if (englishTranslation) {
+            setTranslation(englishTranslation.text);
+          } else {
+            setTranslation(result.translations[0].text);
+          }
+          
+          // For Arabic words, add English explanation to notes if available
+          if (language === 'ar' && result.englishExplanation) {
+            setNotes(`English explanation: ${result.englishExplanation}`);
+          }
         }
-        
-        // Look up word in dictionary
-        const result = await lookupWord(word, language);
-        setDictResult(result);
       } catch (error) {
         console.error('Error checking vocabulary:', error);
       } finally {
@@ -170,11 +186,37 @@ export default function DictionaryPanel({ word, context, language, bookId, onClo
                     </div>
                   ))}
                   
-                  {dictResult.translations && (
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Translations</h3>
+                  {/* Transliteration for Arabic */}
+                  {dictResult.transliterations && dictResult.language === 'ar' && (
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-medium text-muted-foreground">Transliteration</h3>
                       <div className="text-sm">
-                        {dictResult.translations.join(', ')}
+                        {dictResult.transliterations.text}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* English explanation for Arabic */}
+                  {dictResult.englishExplanation && (
+                    <div className="space-y-1 mt-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">English Explanation</h3>
+                      <div className="text-sm bg-muted/50 p-2 rounded">
+                        {dictResult.englishExplanation}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Translations section */}
+                  {dictResult.translations && dictResult.translations.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      <h3 className="text-sm font-medium text-muted-foreground">Translations</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {dictResult.translations.map((translation: any, idx: number) => (
+                          <div key={idx} className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm">
+                            <span className="font-semibold">{translation.language === 'en' ? 'English' : 
+                                            translation.language === 'ar' ? 'Arabic' : translation.language}:</span> {translation.text}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
