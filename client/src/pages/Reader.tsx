@@ -223,7 +223,7 @@ export default function Reader() {
                 word={selectedWord.word}
                 context={selectedWord.context}
                 language={book?.language || 'en'}
-                bookId={parseInt(id || '0')}
+                bookId={id ? parseInt(id) : undefined}
                 onClose={() => setSelectedWord(null)}
               />
             </div>

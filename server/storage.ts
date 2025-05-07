@@ -141,12 +141,22 @@ export class MemStorage implements IStorage {
   async createBook(book: InsertBook): Promise<Book> {
     const id = this.bookId++;
     const now = new Date();
+    
+    // Create a properly typed Book object with all required fields
     const newBook: Book = { 
-      ...book, 
       id, 
-      dateAdded: now, 
-      lastOpened: now 
+      title: book.title,
+      author: book.author ?? null,
+      language: book.language,
+      filePath: book.filePath,
+      fileType: book.fileType,
+      currentPosition: book.currentPosition ?? null,
+      totalPages: book.totalPages ?? null,
+      coverImage: book.coverImage ?? null,
+      dateAdded: now,
+      lastOpened: now
     };
+    
     this.books.set(id, newBook);
     return newBook;
   }
@@ -188,13 +198,22 @@ export class MemStorage implements IStorage {
   async createVocabularyItem(item: InsertVocabularyItem): Promise<VocabularyItem> {
     const id = this.vocabularyId++;
     const now = new Date();
+    
+    // Create properly typed VocabularyItem
     const newItem: VocabularyItem = { 
-      ...item, 
-      id, 
+      id,
+      word: item.word,
+      language: item.language,
+      translation: item.translation ?? null,
+      context: item.context ?? null,
+      notes: item.notes ?? null,
+      bookId: item.bookId ?? null,
+      familiarityScore: item.familiarityScore ?? null, 
       dateAdded: now,
       lastReviewed: now,
       nextReviewDate: now,
     };
+    
     this.vocabularyItems.set(id, newItem);
     return newItem;
   }
@@ -226,11 +245,16 @@ export class MemStorage implements IStorage {
   async createBookmark(bookmark: InsertBookmark): Promise<Bookmark> {
     const id = this.bookmarkId++;
     const now = new Date();
+    
+    // Create properly typed Bookmark
     const newBookmark: Bookmark = { 
-      ...bookmark, 
-      id, 
-      dateAdded: now 
+      id,
+      bookId: bookmark.bookId,
+      position: bookmark.position,
+      note: bookmark.note ?? null,
+      dateAdded: now
     };
+    
     this.bookmarks.set(id, newBookmark);
     return newBookmark;
   }
@@ -256,7 +280,16 @@ export class MemStorage implements IStorage {
   
   async createLanguage(language: InsertLanguage): Promise<Language> {
     const id = this.languageId++;
-    const newLanguage: Language = { ...language, id };
+    
+    // Create properly typed Language
+    const newLanguage: Language = {
+      id,
+      code: language.code,
+      name: language.name,
+      dictionaryPath: language.dictionaryPath ?? null,
+      enabled: language.enabled ?? null
+    };
+    
     this.languages.set(id, newLanguage);
     return newLanguage;
   }
