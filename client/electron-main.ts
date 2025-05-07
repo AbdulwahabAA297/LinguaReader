@@ -5,6 +5,9 @@ import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { fileURLToPath } from 'url';
 import isDev from 'electron-is-dev';
+import { db, initializeDatabase } from '../server/db-sqlite';
+import { eq } from 'drizzle-orm';
+import * as schema from '../shared/schema';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow: BrowserWindow | null = null;
@@ -34,6 +37,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Initialize SQLite database
+  try {
+    initializeDatabase();
+    console.log('SQLite database initialized successfully');
+  } catch (error) {
+    console.error('Error initializing SQLite database:', error);
+  }
+  
   createWindow();
 
   app.on('activate', () => {
@@ -117,6 +128,135 @@ ipcMain.handle('import:vocabularyJSON', async (event, filePath) => {
     return JSON.parse(fileContent);
   } catch (error) {
     console.error('Error importing JSON:', error);
+    throw error;
+  }
+});
+
+// Database API handlers for direct data access in the standalone application
+// Books
+ipcMain.handle('db:getBooks', async () => {
+  try {
+    return db.select().from(schema.books).all();
+  } catch (error) {
+    console.error('Error getting books:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:getBook', async (_, id) => {
+  try {
+    const [book] = db.select().from(schema.books).where(eq(schema.books.id, id)).all();
+    return book || null;
+  } catch (error) {
+    console.error('Error getting book:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:createBook', async (_, bookData) => {
+  try {
+    const [book] = db.insert(schema.books).values(bookData).returning().run();
+    return book;
+  } catch (error) {
+    console.error('Error creating book:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:updateBook', async (_, id, bookData) => {
+  try {
+    const [updated] = db.update(schema.books).set(bookData).where(eq(schema.books.id, id)).returning().run();
+    return updated;
+  } catch (error) {
+    console.error('Error updating book:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:deleteBook', async (_, id) => {
+  try {
+    db.delete(schema.books).where(eq(schema.books.id, id)).run();
+    return true;
+  } catch (error) {
+    console.error('Error deleting book:', error);
+    throw error;
+  }
+});
+
+// Vocabulary
+ipcMain.handle('db:getVocabularyItems', async () => {
+  try {
+    return db.select().from(schema.vocabularyItems).all();
+  } catch (error) {
+    console.error('Error getting vocabulary items:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:createVocabularyItem', async (_, itemData) => {
+  try {
+    const [item] = db.insert(schema.vocabularyItems).values(itemData).returning().run();
+    return item;
+  } catch (error) {
+    console.error('Error creating vocabulary item:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:updateVocabularyItem', async (_, id, itemData) => {
+  try {
+    const [updated] = db.update(schema.vocabularyItems).set(itemData).where(eq(schema.vocabularyItems.id, id)).returning().run();
+    return updated;
+  } catch (error) {
+    console.error('Error updating vocabulary item:', error);
+    throw error;
+  }
+});
+
+// Languages
+ipcMain.handle('db:getLanguages', async () => {
+  try {
+    return db.select().from(schema.languages).all();
+  } catch (error) {
+    console.error('Error getting languages:', error);
+    throw error;
+  }
+});
+
+// Settings
+ipcMain.handle('db:getSetting', async (_, key) => {
+  try {
+    const [setting] = db.select().from(schema.settings).where(eq(schema.settings.key, key)).all();
+    return setting || null;
+  } catch (error) {
+    console.error('Error getting setting:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('db:updateSetting', async (_, key, value) => {
+  try {
+    // Check if setting exists
+    const [existingSetting] = db.select().from(schema.settings).where(eq(schema.settings.key, key)).all();
+    
+    if (existingSetting) {
+      // Update existing setting
+      const [updated] = db.update(schema.settings)
+        .set({ value: JSON.stringify(value) })
+        .where(eq(schema.settings.key, key))
+        .returning()
+        .run();
+      return updated;
+    } else {
+      // Create new setting
+      const [setting] = db.insert(schema.settings)
+        .values({ key, value: JSON.stringify(value) })
+        .returning()
+        .run();
+      return setting;
+    }
+  } catch (error) {
+    console.error('Error updating setting:', error);
     throw error;
   }
 });

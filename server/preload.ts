@@ -61,5 +61,54 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   importVocabularyFromJSON: async (filePath: string): Promise<any> => {
     return ipcRenderer.invoke('import:vocabularyJSON', filePath);
+  },
+  
+  // Database API - for direct access in standalone application
+  // Books
+  getBooks: async (): Promise<any[]> => {
+    return ipcRenderer.invoke('db:getBooks');
+  },
+  
+  getBook: async (id: number): Promise<any> => {
+    return ipcRenderer.invoke('db:getBook', id);
+  },
+  
+  createBook: async (bookData: any): Promise<any> => {
+    return ipcRenderer.invoke('db:createBook', bookData);
+  },
+  
+  updateBook: async (id: number, bookData: any): Promise<any> => {
+    return ipcRenderer.invoke('db:updateBook', id, bookData);
+  },
+  
+  deleteBook: async (id: number): Promise<boolean> => {
+    return ipcRenderer.invoke('db:deleteBook', id);
+  },
+  
+  // Vocabulary
+  getVocabularyItems: async (): Promise<any[]> => {
+    return ipcRenderer.invoke('db:getVocabularyItems');
+  },
+  
+  createVocabularyItem: async (itemData: any): Promise<any> => {
+    return ipcRenderer.invoke('db:createVocabularyItem', itemData);
+  },
+  
+  updateVocabularyItem: async (id: number, itemData: any): Promise<any> => {
+    return ipcRenderer.invoke('db:updateVocabularyItem', id, itemData);
+  },
+  
+  // Languages
+  getLanguages: async (): Promise<any[]> => {
+    return ipcRenderer.invoke('db:getLanguages');
+  },
+  
+  // Settings
+  getSetting: async (key: string): Promise<any> => {
+    return ipcRenderer.invoke('db:getSetting', key);
+  },
+  
+  updateSetting: async (key: string, value: any): Promise<any> => {
+    return ipcRenderer.invoke('db:updateSetting', key, value);
   }
 });
